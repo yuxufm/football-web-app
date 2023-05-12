@@ -1,40 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Teams{% endblock %}
+{% block title %}Teams
+{% endblock %}
 
 {% block body %}
-    <h1 class="mt-5">Teams</h1>
+	<h1 class="mt-5">Teams</h1>
 
-    <a class="btn btn-sm btn-primary my-3" href="{{ path('app_teams_new') }}">Create new</a>
+	<a class="btn btn-sm btn-primary my-3" href="{{ path('app_teams_new') }}">Create new</a>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Country</th>
-                <th>Money Balance</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for index, team in teams %}
-            <tr>
-                <td>{{ index + 1 }}</td>
-                <td>{{ team.name }}</td>
-                <td>{{ team.country }}</td>
-                <td>{{ team.moneyBalance }}</td>
-                <td>
-                    <a class="btn btn-sm btn-primary" href="{{ path('app_teams_show', {'id': team.id}) }}">Show</a>
-                    <a class="btn btn-sm btn-primary" href="{{ path('app_teams_edit', {'id': team.id}) }}">Edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	<div class="d-flex flex-row gap-4">
+		{% for index, team in teams %}
+			<div class="card pt-2" style="width: 18rem;">
+				<div class="text-center">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="heigh: 100px; width: 100px;">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+					</svg>
+				</div>
+				<div class="card-body">
+					<h5>{{ team.name }}</h5>
+					<span style="font-size: 0.9em;">Country:
+						{{ team.country }}</span>
+					<p class="card-text" style="font-size: 0.9em;">Money Balance:
+						{{team.moneyBalance}}</p>
+					<a class="btn btn-sm btn-primary" href="{{ path('app_teams_edit', {'id': team.id}) }}">Edit</a>
+					<a class="btn btn-sm btn-primary" href="{{ path('app_teams_show', {'id': team.id}) }}">Show</a>
+					<a class="btn btn-sm btn-success" href="{{ path('app_players_index', {'team_id': team.id}) }}">View Players</a>
+				</div>
+			</div>
+		{% else %}
+			<div>No teams found.</div>
+		{% endfor %}
+	</div>
+
+
+	{% if max_pages > 0 %}
+		<nav aria-label="pagination" style="margin-top: 30px;">
+			<ul class="pagination pagination-sm">
+				{% for page in range(1, max_pages) %}
+					<li class="page-item {% if app.request.query.get('page') ?? 1 == page %}disabled{% endif %}">
+						<a class="page-link" href="{{ path('app_teams_index', {'page': page}) }}">{{page}}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</nav>
+	{% endif %}
+
 
 {% endblock %}

@@ -14,10 +14,20 @@ use Symfony\Component\Routing\Annotation\Route;
 class TeamsController extends AbstractController
 {
     #[Route('/', name: 'app_teams_index', methods: ['GET'])]
-    public function index(TeamsRepository $teamsRepository): Response
+    public function index(Request $request, TeamsRepository $teamsRepository): Response
     {
+        // pagination
+        $currentPage = $request->query->getInt('page', 1);
+        $limit = 5;
+        $teams = $teamsRepository->paginate($currentPage, $limit); // Returns $limit per page
+        $totalTeams = $teamsRepository->count([]);
+        $maxPages = ceil($totalTeams / $limit);
+        // end of pagination
+
         return $this->render('teams/index.html.twig', [
-            'teams' => $teamsRepository->findAll(),
+            'teams' => $teams,
+            'max_pages' => $maxPages,
+            'limit' => $limit
         ]);
     }
 
@@ -69,7 +79,7 @@ class TeamsController extends AbstractController
     #[Route('/{id}', name: 'app_teams_delete', methods: ['POST'])]
     public function delete(Request $request, Teams $team, TeamsRepository $teamsRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$team->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $team->getId(), $request->request->get('_token'))) {
             $teamsRepository->remove($team, true);
         }
 

@@ -2,28 +2,33 @@
 
 namespace App\Entity;
 
-use App\Repository\TeamsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\PlayersRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TeamsRepository::class)]
+#[ORM\Entity(repositoryClass: PlayersRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Teams
+class Players
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'players')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Teams $team = null;
+
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $country = null;
+    private ?string $surname = null;
 
     #[ORM\Column]
-    private ?int $money_balance = null;
+    private ?int $transfer_fee = null;
+
+    #[ORM\Column]
+    private ?bool $is_open_for_transfer = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -31,17 +36,22 @@ class Teams
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\OneToMany(mappedBy: 'team_id', targetEntity: Players::class)]
-    private Collection $players;
-
-    public function __construct()
-    {
-        $this->players = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTeam(): ?Teams
+    {
+        return $this->team;
+    }
+
+    public function setTeam(?Teams $team): self
+    {
+        $this->team = $team;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -56,26 +66,38 @@ class Teams
         return $this;
     }
 
-    public function getCountry(): ?string
+    public function getSurname(): ?string
     {
-        return $this->country;
+        return $this->surname;
     }
 
-    public function setCountry(string $country): self
+    public function setSurname(string $surname): self
     {
-        $this->country = $country;
+        $this->surname = $surname;
 
         return $this;
     }
 
-    public function getMoneyBalance(): ?int
+    public function getTransferFee(): ?int
     {
-        return $this->money_balance;
+        return $this->transfer_fee;
     }
 
-    public function setMoneyBalance(int $money_balance): self
+    public function setTransferFee(int $transfer_fee): self
     {
-        $this->money_balance = $money_balance;
+        $this->transfer_fee = $transfer_fee;
+
+        return $this;
+    }
+
+    public function isIsOpenForTransfer(): ?bool
+    {
+        return $this->is_open_for_transfer;
+    }
+
+    public function setIsOpenForTransfer(bool $is_open_for_transfer): self
+    {
+        $this->is_open_for_transfer = $is_open_for_transfer;
 
         return $this;
     }
@@ -115,35 +137,5 @@ class Teams
     public function preUpdate(): void
     {
         $this->updated_at = new \DateTimeImmutable();
-    }
-
-    /**
-     * @return Collection<int, Players>
-     */
-    public function getPlayers(): Collection
-    {
-        return $this->players;
-    }
-
-    public function addPlayer(Players $player): self
-    {
-        if (!$this->players->contains($player)) {
-            $this->players->add($player);
-            $player->setTeamId($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlayer(Players $player): self
-    {
-        if ($this->players->removeElement($player)) {
-            // set the owning side to null (unless already changed)
-            if ($player->getTeamId() === $this) {
-                $player->setTeamId(null);
-            }
-        }
-
-        return $this;
     }
 }
