@@ -25,7 +25,7 @@ class PlayersController extends AbstractController
         $currentPage = $request->query->getInt('page', 1);
         $limit = 2;
         $players = $playersRepository->paginate($currentPage, $limit, $teamId); // Returns $limit per page
-        $totalPlayers = $playersRepository->count([]);
+        $totalPlayers = $playersRepository->count(['team' => $teamId]);
         $maxPages = ceil($totalPlayers / $limit);
         // end of pagination
 
@@ -48,7 +48,6 @@ class PlayersController extends AbstractController
         $team = $entityManager->getRepository(Teams::class)->find($teamId);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $player->setIsOpenForTransfer($request->request->get('is_open_for_transfer'));
             $player->setTeam($team);
             $playersRepository->save($player, true);
 

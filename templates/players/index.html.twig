@@ -10,10 +10,13 @@
 	<h1 class="mt-5">{{team.name}}</h1>
 	<p>Country:
 		{{team.country}}</p>
+	<p>Money Balance:
+		{{team.moneyBalance}}</p>
 
 	<a class="btn btn-sm btn-primary my-3" href="{{ path('app_players_new', {'team_id': app.request.query.get('team_id')}) }}">Create new</a>
+	<a class="btn btn-sm btn-success my-3" href="{{ path('app_player_transfers_index', {'buying_team_id': app.request.query.get('team_id')}) }}">Buy players</a>
 
-	<div class="d-flex flex-row gap-4">
+	<div class="d-flex flex-row gap-4 mt-3">
 		{% for index, player in players %}
 			<div class="card pt-3" style="width: 18rem;">
 				<div class="text-center">
@@ -29,16 +32,11 @@
 						{{ player.transferFee }}</p>
 					<p>Is open for transfer:
 						{{ player.isOpenForTransfer ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-danger">No</span>' }}</p>
-
 				</p>
 			</span>
-
-
 		</p>
 		<a class="btn btn-sm btn-primary" href="{{ path('app_players_edit', {'id': player.id, 'team_id': app.request.query.get('team_id')}) }}">Edit</a>
-
 		<a class="btn btn-sm btn-primary" href="{{ path('app_players_show', {'id': player.id, 'team_id': app.request.query.get('team_id')}) }}">Show</a>
-
 	</div>
 </div>{% else %}
 <div>No players found.</div>{% endfor %}</div>{% if max_pages > 0 %}<nav aria-label="pagination" style="margin-top: 30px;">

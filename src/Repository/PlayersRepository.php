@@ -40,13 +40,23 @@ class PlayersRepository extends ServiceEntityRepository
         }
     }
 
-    public function paginate($page = 1, $limit = 5, $teamId): Paginator
+    public function paginate($page = 1, $limit = 5, $teamId, $filterBy = 'team'): Paginator
     {
-        $query = $this->createQueryBuilder('p')
-            ->orderBy('p.created_at', 'DESC')
-            ->andWhere('p.team = :teamId')
-            ->setParameter('teamId', $teamId)
-            ->getQuery();
+        if ($filterBy === 'team') {
+            $query = $this->createQueryBuilder('p')
+                ->orderBy('p.created_at', 'DESC')
+                ->andWhere('p.team = :teamId')
+                ->setParameter('teamId', $teamId)
+                ->getQuery();
+        } else if ($filterBy === 'player_transfers') {
+            $query = $this->createQueryBuilder('p')
+                ->orderBy('p.created_at', 'DESC')
+                ->andWhere('p.team != :teamId')
+                ->andWhere('p.is_open_for_transfer = 1')
+                ->setParameter('teamId', $teamId)
+                ->getQuery();
+        }
+
 
         $paginator = new Paginator($query);
 
@@ -55,6 +65,19 @@ class PlayersRepository extends ServiceEntityRepository
             ->setMaxResults($limit); // Limit
 
         return $paginator;
+    }
+
+    public function countPlayersExcludingTeam($teamId)
+    {
+        $count = $this->createQueryBuilder('p')
+            ->select('COUNT(p)')
+            ->andWhere('p.team != :teamId')
+            ->andWhere('p.is_open_for_transfer = 1')
+            ->setParameter('teamId', $teamId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) $count;
     }
 
     //    /**
